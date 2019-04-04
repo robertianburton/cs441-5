@@ -13,7 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import net.mabboud.android_tone_player.ContinuousBuzzer;
+
 import static android.content.Context.SENSOR_SERVICE;
+
 
 
 /**
@@ -33,6 +36,11 @@ public class HomeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    //tonePLayer
+    ContinuousBuzzer tonePlayer = new ContinuousBuzzer();
+    int pitchHerz = 440;
+
 
     // coord values stuff
     private TextView xText, yText, zText;
@@ -118,9 +126,13 @@ public class HomeFragment extends Fragment {
                     /* getOrientation Values */
                     SensorManager.getOrientation(mRotationM, mOrientation);
 
+                    //
+                    pitchHerz = Math.round(1000 * mOrientation[1]);
+
                     for(int i=0; i<=2; i++){
                         mAccelerometer[i] = Float.toString(mGravs[i]);
                         mMagnetic[i] = Float.toString(mGeoMags[i]);
+
                         mOrientationString[i] = String.format("%.2f",mOrientation[i]);
                         mOldOreintationString[i] = Float.toString(mOldOreintation[i]);
                     }
@@ -244,12 +256,20 @@ public class HomeFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+
+        tonePlayer.setToneFreqInHz(pitchHerz);
+        tonePlayer.play();
+        pitchHerz += 110;
+
+
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+
+        tonePlayer.stop();
     }
 
     /**
