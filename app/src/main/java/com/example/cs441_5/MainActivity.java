@@ -10,7 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
+import android.widget.Button;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.SensorEvent;
@@ -21,10 +21,14 @@ import com.example.cs441_5.dummy.DummyContent;
 public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, ItemFragment.OnListFragmentInteractionListener, AboutFragment.OnFragmentInteractionListener {
 
     private static final int CONTENT_VIEW_ID = 1010;
+
+    //for float rounding precision
+    private static final String FLOAT_ROUND = "";
     private TextView mTextMessage;
 
     //temp, example for future implementation
     private TextView xText, yText, zText;
+    private Button tarButton;
     //private Sensor mySensor;
     private SensorManager SM;
     float[] mGravs = new float[3];
@@ -78,6 +82,8 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
         //Register sensor listener
         //SM.registerListener(this, mySensor, SensorManager.SENSOR_DELAY_NORMAL);
 
+        Button tar = (Button)findViewById(R.id.tarButton);
+
         xText = (TextView)findViewById(R.id.xText);
         yText = (TextView)findViewById(R.id.yText);
         zText = (TextView)findViewById(R.id.zText);
@@ -121,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                     for(int i=0; i<=2; i++){
                         mAccelerometer[i] = Float.toString(mGravs[i]);
                         mMagnetic[i] = Float.toString(mGeoMags[i]);
-                        mOrientationString[i] = Float.toString(mOrientation[i]);
+                        mOrientationString[i] = String.format("%.2f",mOrientation[i]);
                         mOldOreintationString[i] = Float.toString(mOldOreintation[i]);
                     }
 
@@ -141,11 +147,11 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                     zaxisMagneticText.setText(mMagnetic[2]);
                     */
                     TextView xaxisOrientationText = (TextView)findViewById(R.id.xText);
-                    xaxisOrientationText.setText(mOrientationString[0]);
+                    xaxisOrientationText.setText("X coord: ".concat(mOrientationString[0]));
                     TextView yaxisOrientationText = (TextView)findViewById(R.id.yText);
-                    yaxisOrientationText.setText(mOrientationString[1]);
+                    yaxisOrientationText.setText("Y coord: ".concat(mOrientationString[1]));
                     TextView zaxisOrientationText = (TextView)findViewById(R.id.zText);
-                    zaxisOrientationText.setText(mOrientationString[2]);
+                    zaxisOrientationText.setText("Z coord: ".concat(mOrientationString[2]));;
                     /*
                     TextView xaxisOldOrientationText = (TextView)findViewById(R.id.xaxisOldOrientation);
                     xaxisOldOrientationText.setText(mOldOreintationString[0]);
