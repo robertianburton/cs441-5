@@ -6,9 +6,9 @@
     android:name="com.example.cs441_5.ItemFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    android:background="#A8FCFF"
+    android:layout_marginLeft="0dp"
+    android:layout_marginRight="0dp"
+    android:background="#FFA8A8"
     app:layoutManager="LinearLayoutManager"
     tools:context=".ItemFragment"
     tools:listitem="@layout/fragment_item" />

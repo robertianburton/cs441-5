@@ -1,5 +1,6 @@
 package com.example.cs441_5;
 
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -44,6 +45,10 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     String[] mOrientationString =  new String[3];
     String[] mOldOreintationString =  new String[3];
 
+    HomeFragment homeFragment = new HomeFragment();
+    ItemFragment itemFragment = new ItemFragment();
+    AboutFragment aboutFragment = new AboutFragment();
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -53,12 +58,15 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
             switch (item.getItemId()) {
                 case R.id.navigation_home:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, homeFragment).commit();
                     mTextMessage.setText(R.string.title_home);
                     return true;
                 case R.id.navigation_dashboard:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, itemFragment).commit();
                     mTextMessage.setText(R.string.title_dashboard);
                     return true;
                 case R.id.navigation_notifications:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, aboutFragment).commit();
                     mTextMessage.setText(R.string.title_notifications);
                     return true;
             }
@@ -70,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -87,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
         xText = (TextView)findViewById(R.id.xText);
         yText = (TextView)findViewById(R.id.yText);
         zText = (TextView)findViewById(R.id.zText);
+
+        getSupportFragmentManager().beginTransaction().add(R.id.frameLayout, homeFragment).commit();
 
     }
 
