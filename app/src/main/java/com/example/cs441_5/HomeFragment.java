@@ -1,12 +1,19 @@
 package com.example.cs441_5;
 
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import static android.content.Context.SENSOR_SERVICE;
 
 
 /**
@@ -26,6 +33,22 @@ public class HomeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    // coord values stuff
+    private TextView xText, yText, zText;
+    private SensorManager SM;
+    float[] mGravs = new float[3];
+    float[] mGeoMags = new float[3];
+    float[] mRotationM = new float[16];
+    float[] mInclinationM = new float[16];
+    float[] mOrientation = new float[3];
+    float[] mOldOreintation = new float[3];
+    String[] mAccelerometer =  new String[3];
+    String[] mMagnetic =  new String[3];
+    String[] mRotation =  new String[16];
+    String[] mInclination =  new String[16];
+    String[] mOrientationString =  new String[3];
+    String[] mOldOreintationString =  new String[3];
 
     private OnFragmentInteractionListener mListener;
 
@@ -58,11 +81,149 @@ public class HomeFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
+
+    private SensorEventListener sensorEventListener = new SensorEventListener() {
+
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+
+
+        /* Get the Sensors */
+        public void onSensorChanged(SensorEvent event) {
+
+            switch (event.sensor.getType()) {
+                case Sensor.TYPE_ACCELEROMETER:
+                    System.arraycopy(event.values, 0, mGravs, 0, 3);
+                    break;
+                case Sensor.TYPE_MAGNETIC_FIELD:
+                    System.arraycopy(event.values, 0, mGeoMags, 0, 3);
+                    break;
+                case Sensor.TYPE_ORIENTATION:
+                    System.arraycopy(event.values, 0, mOldOreintation, 0, 3);
+                    break;
+
+                default:
+                    return;
+            }
+
+            // If mGravs and mGeoMags have values then find rotation matrix
+            if (mGravs != null && mGeoMags != null) {
+
+                // checks that the rotation matrix is found
+                boolean success = SensorManager.getRotationMatrix(mRotationM, mInclinationM, mGravs, mGeoMags);
+                if (success) {
+                    /* getOrientation Values */
+                    SensorManager.getOrientation(mRotationM, mOrientation);
+
+                    for(int i=0; i<=2; i++){
+                        mAccelerometer[i] = Float.toString(mGravs[i]);
+                        mMagnetic[i] = Float.toString(mGeoMags[i]);
+                        mOrientationString[i] = String.format("%.2f",mOrientation[i]);
+                        mOldOreintationString[i] = Float.toString(mOldOreintation[i]);
+                    }
+
+                    /* Make everything text to show on device */
+                    /*
+                    TextView xaxisAccelerometerText = (TextView)findViewById(R.id.xaxisAccelerometer);
+                    xaxisAccelerometerText.setText(mAccelerometer[0]);
+                    TextView yaxisAccelerometerText = (TextView)findViewById(R.id.yaxisAccelerometer);
+                    yaxisAccelerometerText.setText(mAccelerometer[1]);
+                    TextView zaxisAccelerometerText = (TextView)findViewById(R.id.zaxisAccelerometer);
+                    zaxisAccelerometerText.setText(mAccelerometer[2]);
+                    TextView xaxisMagneticText = (TextView)findViewById(R.id.xaxisMagnetic);
+                    xaxisMagneticText.setText(mMagnetic[0]);
+                    TextView yaxisMagneticText = (TextView)findViewById(R.id.yaxisMagnetic);
+                    yaxisMagneticText.setText(mMagnetic[1]);
+                    TextView zaxisMagneticText = (TextView)findViewById(R.id.zaxisMagnetic);
+                    zaxisMagneticText.setText(mMagnetic[2]);
+                    */
+                    TextView xaxisOrientationText = (TextView)getView().findViewById(R.id.xText);
+                    xaxisOrientationText.setText("X coord: ".concat(mOrientationString[0]));
+                    TextView yaxisOrientationText = (TextView)getView().findViewById(R.id.yText);
+                    yaxisOrientationText.setText("Y coord: ".concat(mOrientationString[1]));
+                    TextView zaxisOrientationText = (TextView)getView().findViewById(R.id.zText);
+                    zaxisOrientationText.setText("Z coord: ".concat(mOrientationString[2]));;
+                    /*
+                    TextView xaxisOldOrientationText = (TextView)getView().findViewById(R.id.xaxisOldOrientation);
+                    xaxisOldOrientationText.setText(mOldOreintationString[0]);
+                    TextView yaxisOldOrientationText = (TextView)getView().findViewById(R.id.yaxisOldOrientation);
+                    yaxisOldOrientationText.setText(mOldOreintationString[1]);
+                    TextView zaxisOldOrientationText = (TextView)getView().findViewById(R.id.zaxisOldOrientation);
+                    zaxisOldOrientationText.setText(mOldOreintationString[2]);
+                    */
+
+                }else{
+
+                    /* Make everything text to show on device even if getRotationMatrix fails*/
+                    String matrixFailed = "Rotation Matrix Failed";
+                    /*
+                    TextView xaxisAccelerometerText = (TextView)getView().findViewById(R.id.xaxisAccelerometer);
+                    xaxisAccelerometerText.setText(mAccelerometer[0]);
+                    TextView yaxisAccelerometerText = (TextView)getView().findViewById(R.id.yaxisAccelerometer);
+                    yaxisAccelerometerText.setText(mAccelerometer[1]);
+                    TextView zaxisAccelerometerText = (TextView)getView().findViewById(R.id.zaxisAccelerometer);
+                    zaxisAccelerometerText.setText(mAccelerometer[2]);
+                    TextView xaxisMagneticText = (TextView)getView().findViewById(R.id.xaxisMagnetic);
+                    xaxisMagneticText.setText(mMagnetic[0]);
+                    TextView yaxisMagneticText = (TextView)getView().findViewById(R.id.yaxisMagnetic);
+                    yaxisMagneticText.setText(mMagnetic[1]);
+                    TextView zaxisMagneticText = (TextView)getView().findViewById(R.id.zaxisMagnetic);
+                    zaxisMagneticText.setText(mMagnetic[2]);
+                    */
+                    TextView xaxisOrientationText = (TextView)getView().findViewById(R.id.xText);
+                    xaxisOrientationText.setText(matrixFailed);
+                    TextView yaxisOrientationText = (TextView)getView().findViewById(R.id.yText);
+                    yaxisOrientationText.setText(matrixFailed);
+                    TextView zaxisOrientationText = (TextView)getView().findViewById(R.id.zText);
+                    zaxisOrientationText.setText(matrixFailed);
+                    /*
+                    TextView xaxisOldOrientationText = (TextView)getView().findViewById(R.id.xaxisOldOrientation);
+                    xaxisOldOrientationText.setText(mOldOreintationString[0]);
+                    TextView yaxisOldOrientationText = (TextView)getView().findViewById(R.id.yaxisOldOrientation);
+                    yaxisOldOrientationText.setText(mOldOreintationString[1]);
+                    TextView zaxisOldOrientationText = (TextView)getView().findViewById(R.id.zaxisOldOrientation);
+                    zaxisOldOrientationText.setText(mOldOreintationString[2]);
+                    */
+
+
+
+                }
+            }
+
+
+        }
+    };
+
+
+    @Override
+    public void onResume() {
+
+        SM = (SensorManager)getActivity().getSystemService(SENSOR_SERVICE);
+        xText = (TextView)getView().findViewById(R.id.xText);
+        yText = (TextView)getView().findViewById(R.id.yText);
+        zText = (TextView)getView().findViewById(R.id.zText);
+        SM.registerListener(sensorEventListener, SM.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        SM.registerListener(sensorEventListener, SM.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
+        SM.registerListener(sensorEventListener, SM.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_NORMAL);
+        super.onResume();
+
+    }
+
+
+    public void onPause() {
+        SM.unregisterListener(sensorEventListener);
+        super.onPause();
+
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
