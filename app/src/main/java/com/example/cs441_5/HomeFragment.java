@@ -127,7 +127,11 @@ public class HomeFragment extends Fragment {
                     SensorManager.getOrientation(mRotationM, mOrientation);
 
                     //
-                    pitchHerz = Math.round(1000 * mOrientation[1]);
+                    double inter = ((mOrientation[1] * -1.0) + 1.5);
+                    mOrientation[1] = (float)inter;
+                    pitchHerz = Math.round((int)(1000 * inter));
+                    tonePlayer.setToneFreqInHz(pitchHerz);
+                    tonePlayer.play();
 
                     for(int i=0; i<=2; i++){
                         mAccelerometer[i] = Float.toString(mGravs[i]);
@@ -257,9 +261,8 @@ public class HomeFragment extends Fragment {
                     + " must implement OnFragmentInteractionListener");
         }
 
-        tonePlayer.setToneFreqInHz(pitchHerz);
-        tonePlayer.play();
-        pitchHerz += 110;
+
+        //pitchHerz += 110;
 
 
     }
