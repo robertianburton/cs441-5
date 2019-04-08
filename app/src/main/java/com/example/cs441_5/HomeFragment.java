@@ -131,6 +131,7 @@ public class HomeFragment extends Fragment {
                     mOrientation[1] = (float)inter;
                     pitchHerz = Math.round((int)(1000 * inter));
                     tonePlayer.setToneFreqInHz(pitchHerz);
+                    tonePlayer.setPausePeriodSeconds(1);
                     tonePlayer.play();
 
                     for(int i=0; i<=2; i++){
